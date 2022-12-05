@@ -8,7 +8,6 @@ let score = 0;
 
 for (const line of lines) {
   const items = line.split(" ");
-  console.log(items);
   if (items.length) {
     if (items[0] === "A") {
       if (items[1] === "X") score += 3;
