@@ -5,7 +5,17 @@ const buff = fs.readFileSync("./input", "utf-8");
 const lines = buff.split("\n");
 
 const headPos = [0, 0];
-const tailPos = [0, 0];
+const tailsPos = [
+  [0, 0],
+  [0, 0],
+  [0, 0],
+  [0, 0],
+  [0, 0],
+  [0, 0],
+  [0, 0],
+  [0, 0],
+  [0, 0],
+];
 
 const passedTailPos = [];
 
@@ -26,48 +36,69 @@ const moveHead = (direction) => {
   }
 };
 
-const findLine = () => {
-  if (tailPos[0] + 2 == headPos[0] && tailPos[1] == headPos[1]) {
-    tailPos[0]++;
-    return 0;
+const findLine = (tailItem, moveTo) => {
+  if (tailItem[0] + 2 == moveTo[0] && tailItem[1] == moveTo[1]) {
+    tailItem[0]++;
+    return tailItem;
   }
-  if (tailPos[0] == headPos[0] && tailPos[1] + 2 == headPos[1]) {
-    tailPos[1]++;
-    return 0;
+  if (tailItem[0] == moveTo[0] && tailItem[1] + 2 == moveTo[1]) {
+    tailItem[1]++;
+    return tailItem;
   }
-  if (tailPos[0] - 2 == headPos[0] && tailPos[1] == headPos[1]) {
-    tailPos[0]--;
-    return 0;
+  if (tailItem[0] - 2 == moveTo[0] && tailItem[1] == moveTo[1]) {
+    tailItem[0]--;
+    return tailItem;
   }
-  if (tailPos[0] == headPos[0] && tailPos[1] - 2 == headPos[1]) {
-    tailPos[1]--;
-    return 0;
+  if (tailItem[0] == moveTo[0] && tailItem[1] - 2 == moveTo[1]) {
+    tailItem[1]--;
+    return tailItem;
   }
-  return 1;
+  return null;
 };
 
-const moveTail = () => {
-  if (findLine() === 0) return;
-  if (tailDist(tailPos, [headPos[0] + 1, headPos[1]]) === 1) {
-    tailPos[0] = headPos[0] + 1;
-    tailPos[1] = headPos[1];
-    return 0;
+const moveTail = (tailItem, moveTo, j) => {
+  if (findLine(tailItem, moveTo) !== null) return tailItem;
+  if (tailDist(tailItem, [moveTo[0] + 1, moveTo[1]]) === 1) {
+    tailItem[0] = moveTo[0] + 1;
+    tailItem[1] = moveTo[1];
+    return tailItem;
   }
-  if (tailDist(tailPos, [headPos[0] - 1, headPos[1]]) === 1) {
-    tailPos[0] = headPos[0] - 1;
-    tailPos[1] = headPos[1];
-    return 0;
+  if (tailDist(tailItem, [moveTo[0] - 1, moveTo[1]]) === 1) {
+    tailItem[0] = moveTo[0] - 1;
+    tailItem[1] = moveTo[1];
+    return tailItem;
   }
-  if (tailDist(tailPos, [headPos[0], headPos[1] + 1]) === 1) {
-    tailPos[0] = headPos[0];
-    tailPos[1] = headPos[1] + 1;
-    return 0;
+  if (tailDist(tailItem, [moveTo[0], moveTo[1] + 1]) === 1) {
+    tailItem[0] = moveTo[0];
+    tailItem[1] = moveTo[1] + 1;
+    return tailItem;
   }
-  if (tailDist(tailPos, [headPos[0], headPos[1] - 1]) === 1) {
-    tailPos[0] = headPos[0];
-    tailPos[1] = headPos[1] - 1;
-    return 0;
+  if (tailDist(tailItem, [moveTo[0], moveTo[1] - 1]) === 1) {
+    tailItem[0] = moveTo[0];
+    tailItem[1] = moveTo[1] - 1;
+    return tailItem;
   }
+  if (tailDist(tailItem, [moveTo[0] + 1, moveTo[1] + 1]) === 1) {
+    tailItem[0] = moveTo[0] + 1;
+    tailItem[1] = moveTo[1] + 1;
+    return tailItem;
+  }
+  if (tailDist(tailItem, [moveTo[0] - 1, moveTo[1] - 1]) === 1) {
+    tailItem[0] = moveTo[0] - 1;
+    tailItem[1] = moveTo[1] - 1;
+    return tailItem;
+  }
+  if (tailDist(tailItem, [moveTo[0] - 1, moveTo[1] + 1]) === 1) {
+    tailItem[0] = moveTo[0] - 1;
+    tailItem[1] = moveTo[1] + 1;
+    return tailItem;
+  }
+  if (tailDist(tailItem, [moveTo[0] + 1, moveTo[1] - 1]) === 1) {
+    tailItem[0] = moveTo[0] + 1;
+    tailItem[1] = moveTo[1] - 1;
+    return tailItem;
+  }
+  return tailItem;
 };
 
 const tailDist = (currentPos, currentHeadPos) => {
@@ -87,9 +118,13 @@ const tailDist = (currentPos, currentHeadPos) => {
 const move = (splitedLine) => {
   for (let i = 0; i < parseInt(splitedLine[1]); i++) {
     moveHead(splitedLine[0]);
-    if (tailDist(tailPos, headPos) === 2) moveTail();
-    if (!passedTailPos.includes(tailPos[0] + " " + tailPos[1]))
-      passedTailPos.push(tailPos[0] + " " + tailPos[1]);
+    for (let j = 0; tailsPos[j]; j++) {
+      if (tailDist(tailsPos[j], j === 0 ? headPos : tailsPos[j - 1]) === 2) {
+        moveTail(tailsPos[j], j === 0 ? headPos : tailsPos[j - 1], j);
+      }
+      if (j === 8 && !passedTailPos.includes(tailsPos[8] + " " + tailsPos[8]))
+        passedTailPos.push(tailsPos[8] + " " + tailsPos[8]);
+    }
   }
 };
 
@@ -98,5 +133,4 @@ for (const line of lines) {
   move(splitedLine);
 }
 
-//console.log(passedTailPos);
 console.log(passedTailPos.length);
