@@ -13,7 +13,7 @@ let x = 0;
 for (const line of lines) {
   map.push(
     line.split("").map((item, index) => {
-      if (item === "S" /*|| item === "a"*/) {
+      if (item === "S" || item === "a") {
         starts.push({ x, y: index, value: 0 });
         return 0;
       }
@@ -27,9 +27,9 @@ for (const line of lines) {
     x++;
 }
 
-const mapBackup = structuredClone(map);
 let count = 1;
-let arrived = 0;
+let isArrived = 0;
+const mapBackup = structuredClone(map);
 
 const checkTop = (pos, newPos) => {
   if (pos.x <= 0) return;
@@ -38,7 +38,7 @@ const checkTop = (pos, newPos) => {
     pos.y === end.y &&
     (pos.value === 26 || pos.value === 25)
   ) {
-    arrived = 1;
+    isArrived = 1;
     return;
   }
   if (map[pos.x - 1][pos.y] !== -1 && map[pos.x - 1][pos.y] <= pos.value + 1) {
@@ -58,7 +58,7 @@ const checkRight = (pos, newPos) => {
     pos.y + 1 === end.y &&
     (pos.value === 26 || pos.value === 25)
   ) {
-    arrived = 1;
+    isArrived = 1;
     return;
   }
   if (map[pos.x][pos.y + 1] !== -1 && map[pos.x][pos.y + 1] <= pos.value + 1) {
@@ -78,7 +78,7 @@ const checkDown = (pos, newPos) => {
     pos.y === end.y &&
     (pos.value === 26 || pos.value === 25)
   ) {
-    arrived = 1;
+    isArrived = 1;
     return;
   }
   if (map[pos.x + 1][pos.y] !== -1 && map[pos.x + 1][pos.y] <= pos.value + 1) {
@@ -98,7 +98,7 @@ const checkLeft = (pos, newPos) => {
     pos.y - 1 === end.y &&
     (pos.value === 26 || pos.value === 25)
   ) {
-    arrived = 1;
+    isArrived = 1;
     return;
   }
   if (map[pos.x][pos.y - 1] !== -1 && map[pos.x][pos.y - 1] <= pos.value + 1) {
@@ -129,7 +129,6 @@ const checkAtPos = (pos) => {
 const searchE = () => {
   const finalCounts = [];
   for (const start of starts) {
-    console.log(start);
     let nextPos = checkAtPos(start);
     while (nextPos.length != 0) {
       count++;
@@ -137,13 +136,14 @@ const searchE = () => {
       for (let i = 0; i < size; i++)
         nextPos = [...nextPos, ...checkAtPos(nextPos[i])];
       for (let i = 0; i < size; i++) nextPos.shift();
+      if (isArrived === 1) break;
     }
-    if (arrived === 1) finalCounts.push([count, start]);
+    if (isArrived === 1) finalCounts.push([count, start]);
     count = 1;
-    arrived = 0;
+    isArrived = 0;
     map = structuredClone(mapBackup);
   }
-  console.log(finalCounts.sort((a, b) => a[0] - b[0]));
+  console.log(finalCounts.sort((a, b) => a[0] - b[0])[0]);
 };
 
 searchE();
