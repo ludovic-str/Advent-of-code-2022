@@ -29,7 +29,7 @@ const maxRange = Math.max(
 
 let total = 0;
 
-for (let x = minX - maxRange * 2; x <= maxX + maxRange * 2; x++) {
+for (let x = minX - maxRange; x <= maxX + maxRange; x++) {
   let isSensor = 0;
   for (const sensor of sensorInfos) {
     if (x === sensor[2] && y === sensor[3]) {
