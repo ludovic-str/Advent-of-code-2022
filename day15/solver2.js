@@ -34,13 +34,22 @@ for (let row = 0; row <= maxY; row++) {
       Math.min(sensorInfo[0] + delta, maxY),
     ]);
   }
-  const str = ".".repeat(maxY).split("");
-  for (const pos of fillX) {
-    for (let i = pos[0]; i <= pos[1]; i++) str[i] = "#";
+
+  let final = 0;
+
+  while (1) {
+    const range = fillX.find((item) => {
+      if (item[0] <= final && final < item[1]) {
+        final = item[1];
+        return true;
+      }
+      return false;
+    });
+
+    if (range === undefined) break;
   }
-  const index = str.indexOf(".");
-  if (index != -1) {
-    console.log(index * 4000000 + row);
+  if (final !== maxY) {
+    console.log(row + (final + 1) * 4000000);
     break;
   }
   console.log(row);
