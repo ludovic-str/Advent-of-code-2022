@@ -37,7 +37,8 @@ const drawPieces = (
 
   for (let i = 0; i < pieces[piecesIndex].length; i++) {
     for (let j = 0; j < pieces[piecesIndex][i].length; j++) {
-      map[posY][posX] = pieces[piecesIndex][i][j];
+      if (pieces[piecesIndex][i][j] === "@")
+        map[posY][posX] = pieces[piecesIndex][i][j];
       posX++;
     }
     posY++;
@@ -132,8 +133,12 @@ const addLines = (map: string[][], pieces: string[][], piecesIndex: number) => {
   for (; i < map.length; i++) {
     if (map[i].includes("#")) break;
   }
-  for (; i < pieces[piecesIndex].length + 3; i++)
-    map.unshift(["|", ".", ".", ".", ".", ".", ".", ".", "|"]);
+  if (i < pieces[piecesIndex].length + 3) {
+    for (; i < pieces[piecesIndex].length + 3; i++)
+      map.unshift(["|", ".", ".", ".", ".", ".", ".", ".", "|"]);
+  } else if (i > pieces[piecesIndex].length + 3) {
+    for (; i > pieces[piecesIndex].length + 3; i--) map.shift();
+  }
 };
 
 const playTurn = (
@@ -146,13 +151,8 @@ const playTurn = (
   let posX = 3;
   let posY = 0;
 
-  let tmpMap = structuredClone(map);
-  drawPieces(tmpMap, pieces, piecesIndex, posY, posX);
-  dumpMap(tmpMap);
   while (1) {
     if (actionIndex === buff.length) actionIndex = 0;
-    tmpMap = structuredClone(map);
-    console.log(buff[actionIndex], actionIndex);
     if (
       buff[actionIndex] === ">" &&
       posX + pieces[piecesIndex][0].length <= 7 &&
@@ -168,8 +168,6 @@ const playTurn = (
     actionIndex++;
     if (checkNextLine(map, pieces, piecesIndex, posY, posX) === 1) break;
     posY++;
-    drawPieces(tmpMap, pieces, piecesIndex, posY, posX);
-    dumpMap(tmpMap);
   }
   drawFinalPieces(map, pieces, piecesIndex, posY, posX);
   return actionIndex;
@@ -179,14 +177,13 @@ const play = (buff: string, map: string[][], pieces: string[][]) => {
   let piecesIndex = 0;
   let actionIndex = 0;
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 2020; i++) {
     actionIndex = playTurn(buff, map, pieces, piecesIndex, actionIndex);
-    //dumpMap(map);
     piecesIndex++;
     if (piecesIndex === 5) piecesIndex = 0;
     addLines(map, pieces, piecesIndex);
   }
-  console.log(map.length);
+  console.log(map.length - 2);
 };
 
 const main = () => {
