@@ -52,7 +52,6 @@ for (let row = 0; row <= maxY; row++) {
     console.log(row + (final + 1) * 4000000);
     break;
   }
-  console.log(row);
 }
 
 // for (let i = 0; i < fillX.length; i++) {
